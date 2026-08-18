@@ -1,0 +1,67 @@
+name: Bug report
+description: Report a reproducible CC Router problem without sensitive data.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Do not include API keys, credentials, private project content, or unredacted diagnostics. Report security vulnerabilities privately as described in SECURITY.md.
+  - type: input
+    id: version
+    attributes:
+      label: CC Router version
+      placeholder: v0.1.0-beta.1 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: Windows 11 24H2 x64
+    validations:
+      required: true
+  - type: dropdown
+    id: mode
+    attributes:
+      label: Route mode
+      options:
+        - Process-scoped launch
+        - Persistent Windows user route
+        - Web preview
+        - Build or development environment
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the observed and expected behavior.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Reproduction steps
+      placeholder: |
+        1. Configure a Provider using a fake or redacted credential
+        2. Select ...
+        3. Click ...
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Redacted diagnostics
+      description: Include only the minimum output needed. Remove tokens, usernames, and private paths.
+      render: text
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed API keys, tokens, usernames, private paths, and project content.
+          required: true
+        - label: This is not a privately reportable security vulnerability.
+          required: true

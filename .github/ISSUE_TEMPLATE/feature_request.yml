@@ -1,0 +1,35 @@
+name: Feature request
+description: Suggest a focused improvement within the CC Router product boundary.
+title: "[Feature]: "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        CC Router is intentionally a Windows-only, no-proxy Claude Code launcher. Requests for proxies, request logging, telemetry, cloud sync, or protocol conversion require an explicit product decision.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem would this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful workflow and its security implications.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Product boundary
+      options:
+        - label: I have described whether this affects credentials, IPC, process environments, persistent routing, or Provider data.
+          required: true

@@ -1,0 +1,39 @@
+:root {
+  --surface: #f1f3f0;
+  --border: #e0e4df;
+  --text-strong: #273029;
+  --text-muted: #7c867e;
+  --mono: Consolas, 'Cascadia Code', 'SFMono-Regular', monospace;
+  font-family: Inter, 'Segoe UI', 'Microsoft YaHei UI', system-ui, sans-serif;
+  color: var(--text-strong);
+  background: var(--surface);
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* { box-sizing: border-box; }
+
+html { min-width: 320px; background: var(--surface); }
+
+body { margin: 0; min-width: 320px; min-height: 100vh; }
+
+button,
+input,
+select { font: inherit; }
+
+button { cursor: pointer; }
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #4cba76;
+  outline-offset: 2px;
+}
+
+::selection { color: #102319; background: #a6eabe; }
+
+::-webkit-scrollbar { width: 9px; height: 9px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #555c55; border: 3px solid transparent; background-clip: padding-box; border-radius: 8px; }
