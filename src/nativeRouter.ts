@@ -31,6 +31,16 @@ export interface CredentialStatus {
   configured: boolean
 }
 
+export interface LaunchReadiness {
+  routeValid: boolean
+  cliAvailable: boolean
+  cliPath?: string
+  credentialConfigured: boolean
+  workingDirectoryValid: boolean
+  conflictingVariables: string[]
+  ready: boolean
+}
+
 export interface UserRouteStatus {
   baseUrl?: string
   model?: string
@@ -80,6 +90,18 @@ export async function getRuntimeInfo(cliPath?: string) {
 
 export async function getCredentialStatus(providerId: string) {
   return invoke<CredentialStatus>('get_credential_status', { providerId })
+}
+
+export async function getLaunchReadiness(
+  provider: Provider,
+  cliPath?: string,
+  workingDirectory?: string,
+) {
+  return invoke<LaunchReadiness>('get_launch_readiness', {
+    route: toNativeRoute(provider),
+    cliPath: cliPath || null,
+    workingDirectory: workingDirectory || null,
+  })
 }
 
 export async function saveCredential(providerId: string, token: string) {

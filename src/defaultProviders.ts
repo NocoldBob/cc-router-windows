@@ -59,3 +59,44 @@ export const defaultProviders: Provider[] = [
     accent: 'orange',
   },
 ]
+
+export interface ProviderTemplateMetadata {
+  verifiedAt: string
+  documentationUrl: string
+}
+
+export const providerTemplateMetadata: Record<string, ProviderTemplateMetadata> = {
+  deepseek: {
+    verifiedAt: '2026-08-19',
+    documentationUrl: 'https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code',
+  },
+  'kimi-global': {
+    verifiedAt: '2026-08-19',
+    documentationUrl: 'https://platform.kimi.ai/docs/models',
+  },
+  'kimi-code': {
+    verifiedAt: '2026-08-19',
+    documentationUrl: 'https://www.kimi.com/code/docs/third-party-tools/claude-code.html',
+  },
+}
+
+const templateFields: Array<keyof Provider> = [
+  'id',
+  'baseUrl',
+  'authEnvName',
+  'mainModel',
+  'fastModel',
+  'opusModel',
+  'sonnetModel',
+  'haikuModel',
+  'fableModel',
+  'subagentModel',
+  'effortLevel',
+  'autoCompactWindow',
+  'maxContextTokens',
+]
+
+export function providerMatchesDefaultTemplate(provider: Provider) {
+  const template = defaultProviders.find((candidate) => candidate.id === provider.id)
+  return Boolean(template && templateFields.every((field) => provider[field] === template[field]))
+}

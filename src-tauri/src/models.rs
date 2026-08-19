@@ -142,6 +142,18 @@ pub struct RuntimeInfo {
 
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
+pub struct LaunchReadiness {
+    pub route_valid: bool,
+    pub cli_available: bool,
+    pub cli_path: Option<String>,
+    pub credential_configured: bool,
+    pub working_directory_valid: bool,
+    pub conflicting_variables: Vec<String>,
+    pub ready: bool,
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CredentialStatus {
     pub provider_id: String,
     pub configured: bool,

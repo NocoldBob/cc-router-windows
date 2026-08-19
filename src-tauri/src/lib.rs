@@ -9,6 +9,7 @@ pub fn run() {
     tauri::Builder::default()
         .invoke_handler(tauri::generate_handler![
             commands::runtime_info,
+            commands::get_launch_readiness,
             commands::get_credential_status,
             commands::save_credential,
             commands::delete_credential,

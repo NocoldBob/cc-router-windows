@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 use std::env;
+use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
 
@@ -11,11 +12,18 @@ use tauri::AppHandle;
 use crate::backup;
 use crate::credentials;
 use crate::models::{
-    ActionResult, CredentialStatus, ProviderRoute, RuntimeInfo, UserRouteStatus, ROUTE_VARIABLES,
+    ActionResult, CredentialStatus, LaunchReadiness, ProviderRoute, RuntimeInfo, UserRouteStatus,
+    ROUTE_VARIABLES,
 };
 use crate::system_env;
 
 const CREATE_NEW_CONSOLE: u32 = 0x0000_0010;
+const CLAUDE_MODE_VARIABLES: [&str; 4] = [
+    "ANTHROPIC_API_KEY",
+    "CLAUDE_CODE_USE_BEDROCK",
+    "CLAUDE_CODE_USE_VERTEX",
+    "CLAUDE_CODE_USE_FOUNDRY",
+];
 
 #[tauri::command]
 pub fn runtime_info(cli_path: Option<String>) -> RuntimeInfo {
@@ -27,6 +35,35 @@ pub fn runtime_info(cli_path: Option<String>) -> RuntimeInfo {
         cli_path: resolved.map(|path| path.to_string_lossy().into_owned()),
         credential_store: "Windows Credential Manager".into(),
     }
+}
+
+#[tauri::command]
+pub fn get_launch_readiness(
+    route: ProviderRoute,
+    cli_path: Option<String>,
+    working_directory: Option<String>,
+) -> Result<LaunchReadiness, String> {
+    let route_valid = route.validate().is_ok();
+    let resolved_cli = resolve_claude_cli(cli_path.as_deref());
+    let cli_available = resolved_cli.is_some();
+    let credential_configured = if route_valid {
+        credentials::provider_token_exists(&route.id)?
+    } else {
+        false
+    };
+    let working_directory_valid = validate_working_directory(working_directory).is_ok();
+    let conflicting_variables = detect_conflicting_variables(|name| env::var_os(name));
+    let ready = route_valid && cli_available && credential_configured && working_directory_valid;
+
+    Ok(LaunchReadiness {
+        route_valid,
+        cli_available,
+        cli_path: resolved_cli.map(|path| path.to_string_lossy().into_owned()),
+        credential_configured,
+        working_directory_valid,
+        conflicting_variables,
+        ready,
+    })
 }
 
 #[tauri::command]
@@ -226,6 +263,18 @@ fn validate_working_directory(value: Option<String>) -> Result<Option<PathBuf>, 
     }
 }
 
+fn detect_conflicting_variables<F>(read_variable: F) -> Vec<String>
+where
+    F: Fn(&str) -> Option<OsString>,
+{
+    CLAUDE_MODE_VARIABLES
+        .iter()
+        .chain(ROUTE_VARIABLES.iter())
+        .filter(|name| read_variable(name).is_some())
+        .map(|name| (*name).to_string())
+        .collect()
+}
+
 fn powershell_quote(value: &str) -> String {
     format!("'{}'", value.replace('\'', "''"))
 }
@@ -249,6 +298,7 @@ fn snapshot_value<'a>(snapshot: &'a crate::models::RouteSnapshot, name: &str) ->
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::collections::HashMap;
 
     #[test]
     fn quotes_powershell_paths() {
@@ -256,5 +306,20 @@ mod tests {
             powershell_quote("C:\\User's\\claude.cmd"),
             "'C:\\User''s\\claude.cmd'"
         );
+    }
+
+    #[test]
+    fn conflict_diagnostics_return_names_without_values() {
+        let environment = HashMap::from([
+            ("ANTHROPIC_API_KEY", OsString::from("must-not-leak")),
+            ("ANTHROPIC_MODEL", OsString::from("old-model")),
+            ("UNRELATED", OsString::from("ignored")),
+        ]);
+
+        let conflicts = detect_conflicting_variables(|name| environment.get(name).cloned());
+
+        assert_eq!(conflicts, ["ANTHROPIC_API_KEY", "ANTHROPIC_MODEL"]);
+        assert!(!format!("{conflicts:?}").contains("must-not-leak"));
+        assert!(!format!("{conflicts:?}").contains("old-model"));
     }
 }

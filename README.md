@@ -79,9 +79,9 @@ Claude Code 窗口后，本次路由自然失效。
 
 ### 2. 安装 CC Router
 
-正式 beta 安装包将发布在本仓库的 [Releases](https://github.com/NocoldBob/cc-router-windows/releases)
-页面，同时提供 SHA-256 校验文件和 GitHub 构建来源证明。首个 Release 发布前，
-可以按照[从源码构建](#从源码构建)运行。
+beta 安装包发布在本仓库的 [Releases](https://github.com/NocoldBob/cc-router-windows/releases)
+页面，同时提供 SHA-256 校验文件和 GitHub 构建来源证明。发布流程会在全新的
+Windows runner 上自动完成静默安装、应用启动和卸载检查。
 
 > [!WARNING]
 > 当前安装包没有商业代码签名，Windows 可能显示“未知发布者”或 SmartScreen
@@ -140,11 +140,11 @@ CLAUDE_CODE_MAX_CONTEXT_TOKENS
 
 ## 内置 Provider
 
-| Provider | Anthropic Base URL | 主模型 | 快速模型 |
-| --- | --- | --- | --- |
-| DeepSeek | `https://api.deepseek.com/anthropic` | `deepseek-v4-pro[1m]` | `deepseek-v4-flash` |
-| Kimi Global | `https://api.moonshot.ai/anthropic` | `kimi-k3` | `kimi-k2.6` |
-| Kimi Code | `https://api.kimi.com/coding/` | `k3[1m]` | `k3-256k` |
+| Provider | Anthropic Base URL | 主模型 | 快速模型 | 最后验证 | 官方资料 |
+| --- | --- | --- | --- | --- | --- |
+| DeepSeek | `https://api.deepseek.com/anthropic` | `deepseek-v4-pro[1m]` | `deepseek-v4-flash` | 2026-08-19 | [Claude Code 接入](https://api-docs.deepseek.com/quick_start/agent_integrations/claude_code) |
+| Kimi Global | `https://api.moonshot.ai/anthropic` | `kimi-k3` | `kimi-k2.6` | 2026-08-19 | [模型文档](https://platform.kimi.ai/docs/models) |
+| Kimi Code | `https://api.kimi.com/coding/` | `k3[1m]` | `k3-256k` | 2026-08-19 | [Claude Code 接入](https://www.kimi.com/code/docs/third-party-tools/claude-code.html) |
 
 内置值是可编辑模板，不是对第三方服务长期可用性的承诺。Kimi Code 的
 `k3[1m]` 写法仅用于 Claude Code 环境变量场景；实际可用模型和上下文取决于
@@ -154,6 +154,15 @@ CLAUDE_CODE_MAX_CONTEXT_TOKENS
 - [Kimi Code 接入 Claude Code](https://www.kimi.com/code/docs/third-party-tools/claude-code.html)
 
 Provider 更新模型或参数后，可以直接在 UI 中修改并保存模板。
+
+应用会显示内置模板的最后验证日期和官方文档入口。编辑过任一技术参数后，界面会
+明确说明该验证日期只适用于默认值，不会把本地自定义值标记为官方已验证。
+
+## 启动就绪检查
+
+桌面路由控制区会在启动前检查 Claude CLI、Credential Manager 凭据、工作目录和
+路由配置。它还会列出当前进程中可能影响 Claude Code 的环境变量名；隔离启动时
+这些变量会被清理或覆盖。诊断仅向前端返回变量名，不返回、记录或显示变量值。
 
 ## 安全边界
 

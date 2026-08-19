@@ -8,11 +8,7 @@ the public beta.
 
 ## [Unreleased]
 
-### Added
-
-- Open-source repository policy, security, contribution, and release files.
-
-## [0.1.0-beta.1] - Unreleased
+## [0.1.0-beta.1] - 2026-08-19
 
 ### Added
 
@@ -21,6 +17,11 @@ the public beta.
 - Windows Credential Manager storage for Provider API keys.
 - Optional confirmation-gated Windows user route with backup and rollback.
 - Provider import and export without API keys.
+- Launch-readiness checks for Claude CLI, credentials, working directory, route validity,
+  and inherited Claude environment variable names without exposing their values.
+- Verification dates and official documentation links for built-in Provider templates.
+- Open-source repository policy, security, contribution, and release files.
+- Clean Windows runner smoke tests for NSIS installation, app startup, and uninstall.
 
 [Unreleased]: https://github.com/NocoldBob/cc-router-windows/compare/v0.1.0-beta.1...HEAD
 [0.1.0-beta.1]: https://github.com/NocoldBob/cc-router-windows/releases/tag/v0.1.0-beta.1

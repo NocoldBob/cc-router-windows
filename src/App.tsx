@@ -6,6 +6,7 @@ import {
   Clipboard,
   Copy,
   Download,
+  ExternalLink,
   Eye,
   EyeOff,
   FolderOpen,
@@ -27,12 +28,17 @@ import {
 } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import './App.css'
-import { defaultProviders } from './defaultProviders'
+import {
+  defaultProviders,
+  providerMatchesDefaultTemplate,
+  providerTemplateMetadata,
+} from './defaultProviders'
 import {
   applyUserRoute,
   clearUserRoute,
   deleteCredential,
   getCredentialStatus,
+  getLaunchReadiness,
   getRuntimeInfo,
   getUserRouteStatus,
   launchClaude,
@@ -40,6 +46,7 @@ import {
   rollbackUserRoute,
   saveCredential,
   type RuntimeInfo,
+  type LaunchReadiness,
   type UserRouteStatus,
 } from './nativeRouter'
 import { generateOutput, generateStatusCommands } from './routerCommands'
@@ -162,6 +169,7 @@ function App() {
     credentialStore: 'Unavailable in web preview',
   })
   const [routeStatus, setRouteStatus] = useState<UserRouteStatus | null>(null)
+  const [launchReadiness, setLaunchReadiness] = useState<LaunchReadiness | null>(null)
   const [cliPath, setCliPath] = useState(() => window.localStorage.getItem(CLI_PATH_KEY) ?? '')
   const [workingDirectory, setWorkingDirectory] = useState(
     () => window.localStorage.getItem(WORKING_DIRECTORY_KEY) ?? '',
@@ -174,6 +182,11 @@ function App() {
   const selected = providers.find((provider) => provider.id === selectedId) ?? providers[0]
   const isDirty = JSON.stringify(providers) !== savedSnapshot
   const isValid = selected ? providerIsValid(selected, providers) : false
+  const templateMetadata = selected ? providerTemplateMetadata[selected.id] : undefined
+  const matchesVerifiedTemplate = selected
+    ? providerMatchesDefaultTemplate(selected)
+    : false
+  const launchReady = Boolean(launchReadiness?.ready && !isDirty && isValid)
   const output = useMemo(
     () => (selected ? generateOutput(selected, mode) : ''),
     [selected, mode],
@@ -181,10 +194,7 @@ function App() {
   const canLaunch = Boolean(
     nativeRuntimeAvailable &&
       selected?.enabled &&
-      isValid &&
-      !isDirty &&
-      credentialConfigured &&
-      runtime.cliAvailable,
+      launchReady,
   )
 
   const flash = (message: string) => {
@@ -216,6 +226,21 @@ function App() {
       })
       .catch((error) => flash(errorMessage(error)))
   }, [selected, refreshCounter])
+
+  useEffect(() => {
+    if (!nativeRuntimeAvailable || !selected) {
+      setLaunchReadiness(null)
+      return
+    }
+
+    const timeout = window.setTimeout(() => {
+      void getLaunchReadiness(selected, cliPath, workingDirectory)
+        .then(setLaunchReadiness)
+        .catch((error) => flash(errorMessage(error)))
+    }, 150)
+
+    return () => window.clearTimeout(timeout)
+  }, [selected, cliPath, workingDirectory, refreshCounter])
 
   const refreshNativeState = () => setRefreshCounter((value) => value + 1)
 
@@ -264,6 +289,7 @@ function App() {
       setCredentialConfigured(true)
       setSecretDraft('')
       setShowSecret(false)
+      refreshNativeState()
       flash('API Key 已保存到 Windows Credential Manager')
     } catch (error) {
       flash(errorMessage(error))
@@ -279,6 +305,7 @@ function App() {
       await deleteCredential(selected.id)
       setCredentialConfigured(false)
       setSecretDraft('')
+      refreshNativeState()
       flash('已从 Windows Credential Manager 删除 API Key')
     } catch (error) {
       flash(errorMessage(error))
@@ -480,6 +507,18 @@ function App() {
                 {routeStatus?.matchesSelected && <span className="route-badge active-route"><Power size={11} />系统默认</span>}
               </div>
               <p>{selected.baseUrl}</p>
+              {templateMetadata && (
+                <div className={`template-meta ${matchesVerifiedTemplate ? '' : 'modified'}`}>
+                  <span>
+                    {matchesVerifiedTemplate
+                      ? `内置模板已验证 ${templateMetadata.verifiedAt}`
+                      : `模板已修改，验证日期 ${templateMetadata.verifiedAt} 仅适用于默认值`}
+                  </span>
+                  <a href={templateMetadata.documentationUrl} target="_blank" rel="noreferrer">
+                    官方文档 <ExternalLink size={11} />
+                  </a>
+                </div>
+              )}
             </div>
           </div>
           <div className="top-actions">
@@ -638,6 +677,48 @@ function App() {
                 <input value={cliPath} placeholder={runtime.cliPath || '自动检测，或填写 claude.exe / claude.cmd'} onChange={(event) => setCliPath(event.target.value)} />
               </label>
             </div>
+
+            {nativeRuntimeAvailable && (
+              <section className="readiness" aria-label="启动就绪检查">
+                <div className="readiness-heading">
+                  <span>启动检查</span>
+                  <strong className={launchReady ? 'ready' : ''}>
+                    {launchReady ? '可以启动' : '需要处理'}
+                  </strong>
+                </div>
+                <div className="readiness-list">
+                  <div className={launchReadiness?.cliAvailable ? 'pass' : 'fail'}>
+                    {launchReadiness?.cliAvailable ? <Check size={13} /> : <AlertTriangle size={13} />}
+                    <span>Claude CLI</span>
+                    <small>{launchReadiness?.cliAvailable ? '已检测到' : '未检测到'}</small>
+                  </div>
+                  <div className={launchReadiness?.credentialConfigured ? 'pass' : 'fail'}>
+                    {launchReadiness?.credentialConfigured ? <Check size={13} /> : <AlertTriangle size={13} />}
+                    <span>API Key</span>
+                    <small>{launchReadiness?.credentialConfigured ? '凭据库已配置' : '需要保存凭据'}</small>
+                  </div>
+                  <div className={launchReadiness?.workingDirectoryValid ? 'pass' : 'fail'}>
+                    {launchReadiness?.workingDirectoryValid ? <Check size={13} /> : <AlertTriangle size={13} />}
+                    <span>工作目录</span>
+                    <small>{launchReadiness?.workingDirectoryValid ? '有效' : '目录不存在'}</small>
+                  </div>
+                  <div className={launchReadiness?.routeValid && isValid && !isDirty ? 'pass' : 'fail'}>
+                    {launchReadiness?.routeValid && isValid && !isDirty ? <Check size={13} /> : <AlertTriangle size={13} />}
+                    <span>路由配置</span>
+                    <small>{isDirty ? '请先保存更改' : isValid ? '校验通过' : '配置无效'}</small>
+                  </div>
+                </div>
+                <div className={`conflict-status ${launchReadiness?.conflictingVariables.length ? 'detected' : ''}`}>
+                  <ShieldCheck size={14} />
+                  <span>
+                    {launchReadiness?.conflictingVariables.length
+                      ? `启动时将清理或覆盖：${launchReadiness.conflictingVariables.join(', ')}`
+                      : '未检测到需要隔离的 Claude 环境变量'}
+                    <small>诊断仅返回变量名，不返回、记录或显示变量值。</small>
+                  </span>
+                </div>
+              </section>
+            )}
 
             <button className="button launch native-launch" disabled={!canLaunch || Boolean(busy)} onClick={() => void startClaude()}>
               <Play size={17} /> {busy === 'launch' ? '正在启动…' : `切换并启动 ${selected.displayName}`}

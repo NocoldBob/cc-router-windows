@@ -29,6 +29,8 @@ CC Router 是一个面向 Windows 的 Claude Code 路由启动器：不运行本
 - 同步管理 11 个 Claude Code 路由、模型、子代理、effort 和上下文变量。
 - 生成脱敏的 PowerShell 和 `settings.json` 备用配置。
 - Provider 导入导出不包含 API Key。
+- 启动前检查 CLI、凭据、工作目录和路由配置，并仅按名称提示将被隔离的环境变量。
+- 内置 Provider 模板显示最后验证日期和官方文档入口。
 - 不运行代理，不转发、读取或记录 prompt、代码、模型回答和 Token 明细。
 
 ### 当前未实现
