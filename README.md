@@ -171,6 +171,10 @@ Activity Bar 中提供原生侧边栏，直接显示当前工作区路由、Prov
 桌面程序；首次启用时确认一次，扩展会为当前 Windows 用户静默安装并打开桌面管理
 工具。已有安装会被自动发现，也保留手动选择程序路径的恢复入口。
 
+[查看完整图文使用指南：安装、配置 Provider、选择工作区路由并启动 Claude Code](docs/VSCODE_COMPANION_GUIDE.md)
+
+![VS Code 中的 CC Router 工作区路由](docs/images/vscode-companion/workspace-routing.png)
+
 扩展不会把 API Key 写入 VS Code 的用户设置、工作区设置或扩展状态。它配置
 Claude Code 官方提供的 `claudeProcessWrapper`，由随扩展打包的
 `cc-router-helper.exe` 在启动新进程时从 Windows Credential Manager 读取 Key。

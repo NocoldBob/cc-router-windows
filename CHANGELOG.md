@@ -8,12 +8,17 @@ the public beta.
 
 ## [Unreleased]
 
+## [0.2.0-beta.1] - 2026-08-20
+
 ### Added
 
 - Windows VS Code Companion extension with per-workspace Provider selection.
 - Credential Manager-backed Claude Code process wrapper that keeps API Keys out of VS Code
   settings and extension state.
 - Shared, secret-free Provider catalog for desktop and extension interoperability.
+- Confirmation-gated desktop installation bundled with the VS Code extension package.
+- Illustrated Chinese guide for installing, configuring, verifying, and troubleshooting the
+  VS Code integration.
 
 ## [0.1.0-beta.1] - 2026-08-19
 
@@ -30,5 +35,6 @@ the public beta.
 - Open-source repository policy, security, contribution, and release files.
 - Clean Windows runner smoke tests for NSIS installation, app startup, and uninstall.
 
-[Unreleased]: https://github.com/NocoldBob/cc-router-windows/compare/v0.1.0-beta.1...HEAD
+[Unreleased]: https://github.com/NocoldBob/cc-router-windows/compare/v0.2.0-beta.1...HEAD
+[0.2.0-beta.1]: https://github.com/NocoldBob/cc-router-windows/compare/v0.1.0-beta.1...v0.2.0-beta.1
 [0.1.0-beta.1]: https://github.com/NocoldBob/cc-router-windows/releases/tag/v0.1.0-beta.1

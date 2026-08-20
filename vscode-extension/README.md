@@ -27,6 +27,8 @@
 不需要预先单独下载桌面程序。若电脑上已经安装过 CC Router，扩展会自动查找并
 直接打开；也可以在设置中指定已有的 `cc-router.exe`。
 
+[完整中文图文指南](https://github.com/NocoldBob/cc-router-windows/blob/main/docs/VSCODE_COMPANION_GUIDE.md)
+
 也可以按 `Ctrl+Shift+P`，执行：
 
 - `CC Router：为工作区选择 Provider`
