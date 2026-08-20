@@ -81,8 +81,7 @@ jobs:
             $uninstaller = Get-ChildItem $installDir -Filter "*.exe" -Recurse |
               Where-Object { $_.Name -match '^(unins|uninstall)' } |
               Select-Object -First 1
-            $installedApp = Get-ChildItem $installDir -Filter "*.exe" -Recurse |
-              Where-Object { $_.Name -notmatch '^(unins|uninstall)' } |
+            $installedApp = Get-ChildItem $installDir -Filter "cc-router.exe" -Recurse |
               Select-Object -First 1
             if (-not $installedApp) { throw "Installed application executable was not found." }
             if (-not $uninstaller) { throw "NSIS uninstaller was not found." }
