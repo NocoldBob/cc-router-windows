@@ -21,7 +21,17 @@ VS Code 会处理依赖；如果 Claude Code 没有自动安装，请在扩展�
 
 ## 第一步：安装 CC Router Companion
 
-### 从 VSIX 安装 beta 版本
+### 从 VS Code Marketplace 安装（推荐）
+
+1. 打开 [CC Router Companion 商店页面](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion)。
+2. 点击 **Install / 安装**，允许页面打开 VS Code。
+3. 在 VS Code 中确认安装，完成后根据提示重新加载窗口。
+
+也可以直接在 VS Code 中按 `Ctrl+Shift+X` 打开扩展面板，搜索
+`CC Router Companion`，确认发布者为 `NocoldBob` 后点击安装。从 Marketplace
+安装可以自动接收后续版本更新。
+
+### 从 VSIX 手动安装（备用）
 
 1. 从本项目 [GitHub Releases](https://github.com/NocoldBob/cc-router-windows/releases)
    下载最新的 `cc-router-companion-*.vsix`。

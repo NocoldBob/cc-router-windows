@@ -1,5 +1,8 @@
 # CC Router 路由助手 / CC Router Companion
 
+[![Visual Studio Marketplace](https://img.shields.io/visual-studio-marketplace/v/NocoldBob.cc-router-companion?label=VS%20Code%20Marketplace&color=0078d4)](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion)
+[![Marketplace installs](https://img.shields.io/visual-studio-marketplace/i/NocoldBob.cc-router-companion?label=installs&color=2f6f50)](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion)
+
 为每个本地 Windows VS Code 工作区选择独立的 Claude Code Provider。支持 CC Router
 桌面端中配置的 DeepSeek、Kimi 和自定义 Anthropic 兼容接口。
 
@@ -18,7 +21,8 @@
 
 ### 快速开始
 
-1. 安装扩展。首次启用时点击 **立即安装**，扩展会安装内置的匹配版本桌面端。
+1. 从 [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion)
+   安装扩展。首次启用时点击 **立即安装**，扩展会安装内置的匹配版本桌面端。
 2. 在自动打开的桌面端配置 Provider 与 API Key，然后点击一次“保存配置”。
 3. 在 VS Code 左侧活动栏打开 **CC Router**。
 4. 点击一个 Provider，为当前工作区启用该路由。
@@ -65,8 +69,8 @@ Code extension.
 
 ### Quick start
 
-1. Install the extension. On first activation, click **Install Now** to install the bundled,
-   matching desktop manager.
+1. Install the extension from the [Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion).
+   On first activation, click **Install Now** to install the bundled, matching desktop manager.
 2. Configure Providers and API Keys in the desktop app that opens, then save once.
 3. Open **CC Router** from the VS Code Activity Bar.
 4. Click a Provider to bind it to the current workspace.

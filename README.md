@@ -7,6 +7,7 @@
   <p>
     <a href="https://github.com/NocoldBob/cc-router-windows/actions/workflows/ci.yml"><img src="https://github.com/NocoldBob/cc-router-windows/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
     <a href="https://github.com/NocoldBob/cc-router-windows/actions/workflows/security.yml"><img src="https://github.com/NocoldBob/cc-router-windows/actions/workflows/security.yml/badge.svg" alt="Security"></a>
+    <a href="https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion"><img src="https://img.shields.io/visual-studio-marketplace/v/NocoldBob.cc-router-companion?label=VS%20Code%20Marketplace&color=0078d4" alt="VS Code Marketplace"></a>
     <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2f6f50.svg" alt="MIT License"></a>
     <a href="#系统要求"><img src="https://img.shields.io/badge/platform-Windows%2010%20%7C%2011-2672ec.svg" alt="Windows 10 and 11"></a>
     <a href="CHANGELOG.md"><img src="https://img.shields.io/badge/status-beta-f26b5e.svg" alt="Beta"></a>
@@ -166,6 +167,10 @@ Provider 更新模型或参数后，可以直接在 UI 中修改并保存模板�
 Activity Bar 中提供原生侧边栏，直接显示当前工作区路由、Provider、模型和凭据
 状态，并可以一键启动官方 Anthropic Claude Code 扩展的新会话。状态栏与命令面板
 入口继续保留。
+
+**推荐安装：** [在 Visual Studio Marketplace 安装 CC Router Companion](https://marketplace.visualstudio.com/items?itemName=NocoldBob.cc-router-companion)。
+安装后可由 VS Code 自动接收后续更新；GitHub Release 中的 VSIX 继续作为手动安装
+和离线安装的备用方式。
 
 发布的 VSIX 内置同版本的 CC Router 桌面安装器。用户安装扩展后无需预先单独下载
 桌面程序；首次启用时确认一次，扩展会为当前 Windows 用户静默安装并打开桌面管理
