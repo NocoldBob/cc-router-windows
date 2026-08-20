@@ -45,6 +45,7 @@ import {
   nativeRuntimeAvailable,
   rollbackUserRoute,
   saveCredential,
+  syncProviderCatalog,
   type RuntimeInfo,
   type LaunchReadiness,
   type UserRouteStatus,
@@ -204,6 +205,11 @@ function App() {
 
   useEffect(() => {
     if (!nativeRuntimeAvailable) return
+    void syncProviderCatalog(initialProviders).catch((error) => flash(errorMessage(error)))
+  }, [initialProviders])
+
+  useEffect(() => {
+    if (!nativeRuntimeAvailable) return
     void getRuntimeInfo(cliPath)
       .then(setRuntime)
       .catch((error) => flash(errorMessage(error)))
@@ -253,13 +259,21 @@ function App() {
     )
   }
 
-  const save = () => {
-    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(providers))
-    window.localStorage.setItem(CLI_PATH_KEY, cliPath)
-    window.localStorage.setItem(WORKING_DIRECTORY_KEY, workingDirectory)
-    setSavedSnapshot(JSON.stringify(providers))
-    refreshNativeState()
-    flash('配置已保存到本机，API Key 未写入浏览器存储')
+  const save = async () => {
+    setBusy('save')
+    try {
+      if (nativeRuntimeAvailable) await syncProviderCatalog(providers)
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(providers))
+      window.localStorage.setItem(CLI_PATH_KEY, cliPath)
+      window.localStorage.setItem(WORKING_DIRECTORY_KEY, workingDirectory)
+      setSavedSnapshot(JSON.stringify(providers))
+      refreshNativeState()
+      flash('配置已保存并同步，API Key 未写入配置文件')
+    } catch (error) {
+      flash(errorMessage(error))
+    } finally {
+      setBusy('')
+    }
   }
 
   const copyOutput = async () => {
@@ -524,7 +538,7 @@ function App() {
           <div className="top-actions">
             {isDirty && <span className="unsaved">未保存更改</span>}
             <button className="button subtle" onClick={duplicateProvider}><Copy size={15} /> 复制</button>
-            <button className="button primary" onClick={save}><Save size={15} /> 保存配置</button>
+            <button className="button primary" disabled={Boolean(busy)} onClick={() => void save()}><Save size={15} /> 保存配置</button>
           </div>
         </header>
 

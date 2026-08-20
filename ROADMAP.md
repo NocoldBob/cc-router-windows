@@ -17,6 +17,7 @@ features.
 - Redacted diagnostic export suitable for issue reports.
 - Optional endpoint and model availability checks that send no project data.
 - Launching an isolated terminal or VS Code workspace with a selected Provider.
+- Marketplace publishing and compatibility checks for the VS Code Companion beta.
 - Windows ARM64 evaluation.
 - Code signing and a carefully designed update path.
 

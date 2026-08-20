@@ -112,6 +112,10 @@ export async function deleteCredential(providerId: string) {
   return invoke<CredentialStatus>('delete_credential', { providerId })
 }
 
+export async function syncProviderCatalog(providers: Provider[]) {
+  return invoke<void>('sync_provider_catalog', { providers })
+}
+
 export async function getUserRouteStatus(provider: Provider) {
   return invoke<UserRouteStatus>('get_user_route_status', {
     route: toNativeRoute(provider),

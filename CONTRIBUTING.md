@@ -36,6 +36,7 @@ pnpm desktop:info
 pnpm lint
 pnpm test
 pnpm build
+pnpm vscode:check
 cd src-tauri
 cargo fmt --all -- --check
 cargo test

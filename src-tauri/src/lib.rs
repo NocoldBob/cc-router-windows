@@ -1,7 +1,8 @@
 mod backup;
 mod commands;
-mod credentials;
-mod models;
+pub mod credentials;
+pub mod models;
+pub mod provider_store;
 mod system_env;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -13,6 +14,7 @@ pub fn run() {
             commands::get_credential_status,
             commands::save_credential,
             commands::delete_credential,
+            commands::sync_provider_catalog,
             commands::get_user_route_status,
             commands::launch_claude,
             commands::apply_user_route,

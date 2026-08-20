@@ -8,6 +8,13 @@ the public beta.
 
 ## [Unreleased]
 
+### Added
+
+- Windows VS Code Companion extension with per-workspace Provider selection.
+- Credential Manager-backed Claude Code process wrapper that keeps API Keys out of VS Code
+  settings and extension state.
+- Shared, secret-free Provider catalog for desktop and extension interoperability.
+
 ## [0.1.0-beta.1] - 2026-08-19
 
 ### Added

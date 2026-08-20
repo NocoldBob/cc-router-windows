@@ -34,6 +34,8 @@ CC Router 从 Windows Credential Manager 读取所选 API Key，把 Provider、�
 - **Provider 可编辑**：内置 DeepSeek、Kimi Global 和 Kimi Code 模板，也可以添加
   自定义 Anthropic 兼容 HTTPS Provider。
 - **安全导入导出**：Provider JSON、路由状态和备用配置不包含 API Key。
+- **VS Code Companion**：可为每个本地 Windows 工作区选择独立 Provider，并通过
+  官方 Claude Code 扩展支持的进程 wrapper 启动新会话。
 
 ## 适用场景
 
@@ -158,6 +160,25 @@ Provider 更新模型或参数后，可以直接在 UI 中修改并保存模板�
 应用会显示内置模板的最后验证日期和官方文档入口。编辑过任一技术参数后，界面会
 明确说明该验证日期只适用于默认值，不会把本地自定义值标记为官方已验证。
 
+## VS Code Companion
+
+仓库中的 `vscode-extension` 提供 Windows 专用的 VS Code Companion。扩展在
+Activity Bar 中提供原生侧边栏，直接显示当前工作区路由、Provider、模型和凭据
+状态，并可以一键启动官方 Anthropic Claude Code 扩展的新会话。状态栏与命令面板
+入口继续保留。
+
+发布的 VSIX 内置同版本的 CC Router 桌面安装器。用户安装扩展后无需预先单独下载
+桌面程序；首次启用时确认一次，扩展会为当前 Windows 用户静默安装并打开桌面管理
+工具。已有安装会被自动发现，也保留手动选择程序路径的恢复入口。
+
+扩展不会把 API Key 写入 VS Code 的用户设置、工作区设置或扩展状态。它配置
+Claude Code 官方提供的 `claudeProcessWrapper`，由随扩展打包的
+`cc-router-helper.exe` 在启动新进程时从 Windows Credential Manager 读取 Key。
+桌面端和扩展共享的 `providers.json` 只包含非敏感 Provider 元数据。
+
+当前 Companion beta 仅支持本地 Windows 工作区，不支持 WSL、SSH 和 Dev
+Containers。已有 Claude Code 会话不会热切换，选择结果仅应用于新会话。
+
 ## 启动就绪检查
 
 桌面路由控制区会在启动前检查 Claude CLI、Credential Manager 凭据、工作目录和
@@ -204,6 +225,10 @@ pnpm desktop:dev
 
 # 生成 NSIS 安装包
 pnpm desktop:build
+
+# 检查并生成 VS Code VSIX
+pnpm vscode:check
+pnpm vscode:package
 ```
 
 ### 验证
@@ -231,9 +256,15 @@ src/
 src-tauri/src/
   commands.rs             Claude Code 启动和本地命令
   credentials.rs          Windows Credential Manager
+  provider_store.rs       桌面端和扩展共享的无密钥 Provider 配置
   system_env.rs           Windows 用户环境读写
   backup.rs               无明文 Key 的路由备份与回滚
   models.rs               路由校验和 IPC 数据结构
+
+vscode-extension/
+  src/                    Companion 状态栏、命令和 helper 调用
+  bin/                    打包时生成的 Windows helper
+  desktop/                打包时生成的同版本桌面安装器
 ```
 
 ## 参与项目

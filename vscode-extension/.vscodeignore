@@ -1,0 +1,7 @@
+.github/**
+src/**
+scripts/**
+tsconfig.json
+bin/.gitkeep
+desktop/.gitkeep
+*.vsix

@@ -12,9 +12,10 @@ use tauri::AppHandle;
 use crate::backup;
 use crate::credentials;
 use crate::models::{
-    ActionResult, CredentialStatus, LaunchReadiness, ProviderRoute, RuntimeInfo, UserRouteStatus,
-    ROUTE_VARIABLES,
+    ActionResult, CredentialStatus, LaunchReadiness, ProviderConfig, ProviderRoute, RuntimeInfo,
+    UserRouteStatus, ROUTE_VARIABLES,
 };
+use crate::provider_store;
 use crate::system_env;
 
 const CREATE_NEW_CONSOLE: u32 = 0x0000_0010;
@@ -90,6 +91,11 @@ pub fn delete_credential(provider_id: String) -> Result<CredentialStatus, String
         provider_id,
         configured: false,
     })
+}
+
+#[tauri::command]
+pub fn sync_provider_catalog(providers: Vec<ProviderConfig>) -> Result<(), String> {
+    provider_store::save_provider_catalog(&providers)
 }
 
 #[tauri::command]

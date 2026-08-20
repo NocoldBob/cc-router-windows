@@ -10,6 +10,8 @@ on:
     paths:
       - package.json
       - pnpm-lock.yaml
+      - pnpm-workspace.yaml
+      - vscode-extension/package.json
       - src-tauri/Cargo.toml
       - src-tauri/Cargo.lock
       - .github/workflows/security.yml

@@ -43,6 +43,9 @@ jobs:
       - name: Build frontend
         run: pnpm build
 
+      - name: Check VS Code extension
+        run: pnpm vscode:check
+
   rust:
     name: Rust checks
     runs-on: windows-latest

@@ -1,0 +1,163 @@
+{
+  "name": "cc-router-companion",
+  "displayName": "%extension.displayName%",
+  "description": "%extension.description%",
+  "version": "0.3.0",
+  "publisher": "NocoldBob",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/NocoldBob/cc-router-windows.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NocoldBob/cc-router-windows/issues"
+  },
+  "homepage": "https://github.com/NocoldBob/cc-router-windows#readme",
+  "engines": {
+    "vscode": ">=1.90.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "claude-code",
+    "deepseek",
+    "kimi",
+    "provider",
+    "router"
+  ],
+  "extensionKind": [
+    "ui"
+  ],
+  "main": "./dist/extension.js",
+  "icon": "media/icon.png",
+  "activationEvents": [
+    "onStartupFinished",
+    "onView:ccRouter.overview",
+    "onCommand:ccRouter.selectProvider",
+    "onCommand:ccRouter.newClaudeSession",
+    "onCommand:ccRouter.configureIntegration"
+  ],
+  "extensionDependencies": [
+    "anthropic.claude-code"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "ccRouter",
+          "title": "%view.container%",
+          "icon": "media/activitybar.svg"
+        }
+      ]
+    },
+    "views": {
+      "ccRouter": [
+        {
+          "id": "ccRouter.overview",
+          "name": "%view.overview%"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "ccRouter.overview",
+        "contents": "尚未找到共享 Provider 配置。\nNo shared Provider configuration was found.\n[安装或启动 CC Router 桌面端 / Install or open desktop app](command:ccRouter.openDesktop)\n[已保存配置，刷新 / Saved, refresh now](command:ccRouter.refresh)",
+        "when": "ccRouter.needsSetup"
+      },
+      {
+        "view": "ccRouter.overview",
+        "contents": "请先打开一个本地 Windows 文件夹或工作区。\nOpen a local Windows folder or workspace first.",
+        "when": "ccRouter.noWorkspace"
+      }
+    ],
+    "commands": [
+      {
+        "command": "ccRouter.selectProvider",
+        "title": "%command.selectProvider%",
+        "icon": "$(server-environment)"
+      },
+      {
+        "command": "ccRouter.newClaudeSession",
+        "title": "%command.startSession%",
+        "icon": "$(play)"
+      },
+      {
+        "command": "ccRouter.clearProvider",
+        "title": "%command.clearProvider%",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "ccRouter.configureIntegration",
+        "title": "%command.configureIntegration%"
+      },
+      {
+        "command": "ccRouter.restorePreviousWrapper",
+        "title": "%command.restoreWrapper%"
+      },
+      {
+        "command": "ccRouter.refresh",
+        "title": "%command.refresh%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "ccRouter.openDesktop",
+        "title": "%command.openDesktop%",
+        "icon": "$(settings-gear)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "ccRouter.refresh",
+          "when": "view == ccRouter.overview",
+          "group": "navigation@1"
+        },
+        {
+          "command": "ccRouter.openDesktop",
+          "when": "view == ccRouter.overview",
+          "group": "navigation@2"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "ccRouter.restorePreviousWrapper",
+          "when": "ccRouter.integrationConfigured"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "CC Router",
+      "properties": {
+        "ccRouter.helperPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "%configuration.helperPath%"
+        },
+        "ccRouter.desktopPath": {
+          "type": "string",
+          "default": "",
+          "scope": "machine",
+          "description": "%configuration.desktopPath%"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "check": "tsc --noEmit -p tsconfig.json && oxlint src",
+    "compile": "tsc -p tsconfig.json",
+    "build:helper": "cargo build --manifest-path ../src-tauri/Cargo.toml --release --bin cc-router-helper",
+    "build:desktop": "pnpm --dir .. desktop:build",
+    "copy:binaries": "node scripts/copy-binaries.mjs",
+    "prepare:package": "pnpm build:desktop && pnpm build:helper && pnpm copy:binaries && pnpm compile",
+    "package:vsix": "pnpm prepare:package && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/vsce": "^3.6.2",
+    "oxlint": "^1.75.0",
+    "typescript": "~6.0.2"
+  }
+}

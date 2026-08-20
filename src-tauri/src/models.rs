@@ -33,6 +33,29 @@ pub struct ProviderRoute {
     pub max_context_tokens: String,
 }
 
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct ProviderConfig {
+    #[serde(flatten)]
+    pub route: ProviderRoute,
+    pub notes: String,
+    pub enabled: bool,
+    pub accent: String,
+}
+
+impl ProviderConfig {
+    pub fn validate(&self) -> Result<(), String> {
+        self.route.validate()?;
+        if !matches!(self.accent.as_str(), "green" | "blue" | "orange" | "violet") {
+            return Err("Provider accent is invalid.".into());
+        }
+        if self.notes.chars().any(|character| character == '\0') {
+            return Err("Provider notes cannot contain null bytes.".into());
+        }
+        Ok(())
+    }
+}
+
 impl ProviderRoute {
     pub fn validate(&self) -> Result<(), String> {
         validate_provider_id(&self.id)?;

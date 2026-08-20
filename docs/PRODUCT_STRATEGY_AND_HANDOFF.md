@@ -25,6 +25,10 @@ CC Router 是一个面向 Windows 的 Claude Code 路由启动器：不运行本
 - API Key 保存到 Windows Credential Manager，前端只获取“是否已配置”。
 - 向新启动的 Claude Code 子进程注入路由，不修改全局环境。
 - 可选地写入 Windows 用户环境，供新终端和重启后的 VS Code Claude Code 插件读取。
+- 提供 Windows VS Code Companion beta，为每个本地工作区选择 Provider，并通过
+  Claude Code 的受支持进程 wrapper 启动隔离的新会话。
+- VS Code Companion 的 VSIX 内置同版本桌面安装器，首次启用时经用户确认后为当前
+  Windows 用户安装；不要求用户预先单独下载桌面端。
 - 系统写入前备份旧路由，支持一次回滚。
 - 同步管理 11 个 Claude Code 路由、模型、子代理、effort 和上下文变量。
 - 生成脱敏的 PowerShell 和 `settings.json` 备用配置。
@@ -77,6 +81,8 @@ CC Router 不在 HTTP 请求路径中。应用关闭后，已经启动的 Claude
 - “设为 Windows 默认”会把 Key 写入用户级 `ANTHROPIC_AUTH_TOKEN`，这是明文用户环境变量；UI 和文档必须继续明确提示。
 - 同一 Windows 用户权限下的恶意进程仍可能读取目标进程环境或调用系统凭据接口；Credential Manager 不是对本机同权限恶意软件的绝对隔离。
 - 软件未代码签名时，Windows 可能显示未知发布者或 SmartScreen 提示。
+- VS Code Companion 不得无提示安装桌面程序；首次安装必须明确征得用户确认，并
+  保留已有安装自动发现和手动选择程序路径的恢复入口。
 - Provider 最终会接收用户发送给模型的数据；“不上传数据”仅指 CC Router 自身没有项目运营的后端和额外上传行为。
 
 ## 4. 与 CC Switch 的主要差异
@@ -224,6 +230,9 @@ Key 由 Credential Manager 保存并由 Rust 后端按需读取。配置导出�
 - `src-tauri/src/commands.rs`：进程启动、系统应用、清除与回滚。
 - `src-tauri/src/backup.rs`：不含明文 Key 的回滚备份。
 - `src-tauri/src/models.rs`：路由校验和 11 个环境变量定义。
+- `src-tauri/src/provider_store.rs`：桌面端与 VS Code Companion 共享的无密钥配置。
+- `src-tauri/src/bin/cc-router-helper.rs`：Credential Manager 支持的 Claude wrapper。
+- `vscode-extension/src/extension.ts`：VS Code 状态栏、工作区选择与 Claude Code 集成。
 
 接手修改前，至少运行：
 
