@@ -1,7 +1,12 @@
 import { spawn } from 'node:child_process'
 import { existsSync } from 'node:fs'
 import * as vscode from 'vscode'
-import { findDesktopExecutable, focusRunningDesktop, installDesktop } from './desktopApp'
+import {
+  findDesktopExecutable,
+  focusRunningDesktop,
+  installDesktop,
+  stopRunningDesktop,
+} from './desktopApp'
 import {
   clearProvider,
   helperExists,
@@ -53,8 +58,11 @@ export function activate(context: vscode.ExtensionContext): void {
       configureIntegration(context)),
     vscode.commands.registerCommand('ccRouter.restorePreviousWrapper', () =>
       restorePreviousWrapper(context)),
-    vscode.commands.registerCommand('ccRouter.refresh', refresh),
+    vscode.commands.registerCommand('ccRouter.refresh', () =>
+      refreshWithFeedback(context, refresh)),
     vscode.commands.registerCommand('ccRouter.openDesktop', () => openDesktop(context)),
+    vscode.commands.registerCommand('ccRouter.repairDesktop', () =>
+      repairDesktop(context, refresh)),
     vscode.window.onDidChangeActiveTextEditor(refresh),
     vscode.workspace.onDidChangeWorkspaceFolders(refresh),
     vscode.workspace.onDidChangeConfiguration((event) => {
@@ -375,11 +383,134 @@ function helperReady(context: vscode.ExtensionContext): boolean {
 }
 
 async function showHelperError(context: vscode.ExtensionContext, error: unknown): Promise<void> {
+  const repair = text('修复/更新桌面端', 'Repair/Update Desktop')
+  const open = text('打开 CC Router', 'Open CC Router')
   const action = await vscode.window.showErrorMessage(
     localizedError(error),
-    text('打开 CC Router', 'Open CC Router'),
+    ...(sharedCatalogMissing(error) ? [repair, open] : [open]),
   )
-  if (action) await openDesktop(context)
+  if (action === repair) {
+    await vscode.commands.executeCommand('ccRouter.repairDesktop')
+  } else if (action === open) {
+    await openDesktop(context)
+  }
+}
+
+async function refreshWithFeedback(
+  context: vscode.ExtensionContext,
+  refresh: () => Promise<void>,
+): Promise<void> {
+  if (!environmentSupported() || !helperReady(context)) return
+  const workspace = currentWorkspace()
+  if (!workspace) {
+    await refresh()
+    void vscode.window.showWarningMessage(
+      text('请先打开一个本地文件夹或工作区。', 'Open a local folder or workspace first.'),
+    )
+    return
+  }
+
+  try {
+    const providers = await listProviders(context, workspace)
+    await refresh()
+    void vscode.window.showInformationMessage(
+      text(
+        `已读取 ${providers.length} 个 Provider 配置。`,
+        `Loaded ${providers.length} Provider configurations.`,
+      ),
+    )
+  } catch (error) {
+    await refresh()
+    await showHelperError(context, error)
+  }
+}
+
+async function repairDesktop(
+  context: vscode.ExtensionContext,
+  refresh: () => Promise<void>,
+): Promise<void> {
+  if (!environmentSupported()) return
+  const installer = context.asAbsolutePath('desktop/cc-router-desktop-setup.exe')
+  if (!existsSync(installer)) {
+    void vscode.window.showErrorMessage(
+      text(
+        '当前扩展包未包含桌面安装器，请从 Marketplace 更新或重新安装 CC Router Companion。',
+        'This extension package has no desktop installer. Update or reinstall CC Router Companion from the Marketplace.',
+      ),
+    )
+    return
+  }
+
+  const confirm = text('修复并重新打开', 'Repair and Reopen')
+  const choice = await vscode.window.showWarningMessage(
+    text(
+      '这会关闭正在运行的 CC Router，并用扩展内置的匹配版本覆盖安装。Provider 配置会保留，API Key 仍保存在 Windows Credential Manager。',
+      'This closes the running CC Router and reinstalls the matching bundled version. Provider settings are preserved and API Keys remain in Windows Credential Manager.',
+    ),
+    { modal: true },
+    confirm,
+  )
+  if (choice !== confirm) return
+
+  try {
+    await vscode.window.withProgress(
+      {
+        location: vscode.ProgressLocation.Notification,
+        title: text('正在修复 CC Router 桌面端...', 'Repairing CC Router desktop...'),
+        cancellable: false,
+      },
+      async () => {
+        await stopRunningDesktop()
+        await installDesktop(installer)
+      },
+    )
+    const executable = await findDesktopExecutable('')
+    if (!executable) {
+      throw new Error(text('修复后未找到桌面程序。', 'Desktop app was not found after repair.'))
+    }
+    launchDesktop(executable)
+
+    const synchronized = await waitForProviderCatalog(context, currentWorkspace())
+    await refresh()
+    if (synchronized) {
+      void vscode.window.showInformationMessage(
+        text(
+          '桌面端已修复，共享 Provider 配置已恢复。',
+          'Desktop repaired and the shared Provider configuration is available.',
+        ),
+      )
+    } else {
+      void vscode.window.showWarningMessage(
+        text(
+          '桌面端已修复并打开。请在桌面端点击一次“保存配置”，然后再刷新此视图。',
+          'Desktop repaired and opened. Save once in the desktop app, then refresh this view.',
+        ),
+      )
+    }
+  } catch (error) {
+    void vscode.window.showErrorMessage(
+      text(
+        `CC Router 桌面端修复失败：${localizedError(error)}`,
+        `CC Router desktop repair failed: ${localizedError(error)}`,
+      ),
+    )
+  }
+}
+
+async function waitForProviderCatalog(
+  context: vscode.ExtensionContext,
+  workspace: string | undefined,
+): Promise<boolean> {
+  if (!workspace) return false
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    try {
+      await listProviders(context, workspace)
+      return true
+    } catch {
+      await new Promise((resolve) => setTimeout(resolve, 500))
+    }
+  }
+  return false
 }
 
 async function openDesktop(context: vscode.ExtensionContext): Promise<void> {
@@ -448,6 +579,10 @@ async function openDesktop(context: vscode.ExtensionContext): Promise<void> {
     if (!executable) return
   }
 
+  launchDesktop(executable)
+}
+
+function launchDesktop(executable: string): void {
   const child = spawn(executable, [], { detached: true, stdio: 'ignore', windowsHide: true })
   child.unref()
 }
@@ -476,11 +611,16 @@ function pathsEqual(left: string, right: string): boolean {
 
 function localizedError(error: unknown): string {
   const message = error instanceof Error ? error.message : String(error)
-  if (message.includes('Shared Provider configuration is not initialized')) {
+  if (sharedCatalogMissing(error)) {
     return text(
-      '尚未生成共享 Provider 配置。请打开新版 CC Router 桌面端并保存一次配置。',
-      'Shared Provider configuration is not initialized. Open CC Router desktop and save once.',
+      '尚未生成共享 Provider 配置。可能打开了旧版桌面端，或桌面端与 VS Code 使用了不同的 Windows 账户。请修复/更新桌面端后重新保存。',
+      'Shared Provider configuration is missing. The desktop app may be outdated or running under a different Windows account. Repair/update it, then save again.',
     )
   }
   return message.replace(/^CC Router:\s*/, '')
+}
+
+function sharedCatalogMissing(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error)
+  return message.includes('Shared Provider configuration is not initialized')
 }

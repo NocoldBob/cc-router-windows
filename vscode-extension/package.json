@@ -2,7 +2,7 @@
   "name": "cc-router-companion",
   "displayName": "%extension.displayName%",
   "description": "%extension.description%",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "publisher": "NocoldBob",
   "license": "MIT",
   "repository": {
@@ -62,7 +62,7 @@
     "viewsWelcome": [
       {
         "view": "ccRouter.overview",
-        "contents": "尚未找到共享 Provider 配置。\nNo shared Provider configuration was found.\n[安装或启动 CC Router 桌面端 / Install or open desktop app](command:ccRouter.openDesktop)\n[已保存配置，刷新 / Saved, refresh now](command:ccRouter.refresh)",
+        "contents": "尚未找到共享 Provider 配置。\nNo shared Provider configuration was found.\n[安装或启动桌面端 / Install or open desktop](command:ccRouter.openDesktop)\n[修复或更新桌面端 / Repair or update desktop](command:ccRouter.repairDesktop)\n[已保存配置，刷新 / Saved, refresh now](command:ccRouter.refresh)",
         "when": "ccRouter.needsSetup"
       },
       {
@@ -104,6 +104,10 @@
         "command": "ccRouter.openDesktop",
         "title": "%command.openDesktop%",
         "icon": "$(settings-gear)"
+      },
+      {
+        "command": "ccRouter.repairDesktop",
+        "title": "%command.repairDesktop%"
       }
     ],
     "menus": {

@@ -176,6 +176,10 @@ Activity Bar 中提供原生侧边栏，直接显示当前工作区路由、Prov
 桌面程序；首次启用时确认一次，扩展会为当前 Windows 用户静默安装并打开桌面管理
 工具。已有安装会被自动发现，也保留手动选择程序路径的恢复入口。
 
+如果已有安装版本过旧，桌面端保存后可能无法生成插件需要的共享 Provider 文件。
+Companion 提供确认后执行的“修复或更新桌面端”命令，使用 VSIX 内置版本覆盖安装，
+并在刷新时明确显示读取结果或失败原因。
+
 [查看完整图文使用指南：安装、配置 Provider、选择工作区路由并启动 Claude Code](docs/VSCODE_COMPANION_GUIDE.md)
 
 ![VS Code 中的 CC Router 工作区路由](docs/images/vscode-companion/workspace-routing.png)

@@ -38,6 +38,7 @@
 - `CC Router：为工作区选择 Provider`
 - `CC Router：启动 Claude Code 新会话`
 - `CC Router：清除工作区 Provider`
+- `CC Router：修复或更新桌面端`
 
 只有新启动的 Claude Code 会话使用所选路由，已有会话不会热切换。
 
@@ -50,6 +51,16 @@ Credential Manager 安全保存 API Key。扩展不会把 Key 写入 VS Code 用
 
 当前 beta 仅支持本地 Windows 10/11 x64 工作区，暂不支持 WSL、SSH 和 Dev
 Containers。需要同时安装 Anthropic 官方 Claude Code 扩展。
+
+### 配置保存后仍然不显示
+
+如果桌面端可以保存，但侧边栏一直显示“尚未找到共享 Provider 配置”，通常是电脑上
+残留的旧版桌面端被插件优先打开。点击侧边栏中的 **修复或更新桌面端**，确认后插件会
+关闭旧桌面端，并用 VSIX 内置的匹配版本覆盖安装。Provider 配置会保留，API Key 仍在
+Windows Credential Manager 中。
+
+修复完成后，插件会自动等待共享配置；若仍未出现，请在重新打开的桌面端点击一次
+**保存配置**，再点击刷新。桌面端和 VS Code 还必须运行在同一个 Windows 用户账户下。
 
 ---
 
@@ -78,6 +89,11 @@ Code extension.
 
 No separate desktop download is required. An existing CC Router installation is discovered
 automatically, and a custom executable can still be selected as a recovery option.
+
+If settings save in the desktop app but the sidebar still cannot find the shared Provider catalog,
+run **CC Router: Repair or Update Desktop App**. After confirmation, the extension closes the old
+desktop process and reinstalls the matching bundled version. Provider settings and Credential
+Manager entries are preserved. The desktop app and VS Code must run under the same Windows user.
 
 Only new Claude Code sessions use the selected route. Existing sessions are not hot-switched.
 

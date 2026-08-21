@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.3.1
+
+- Made manual refresh report whether the shared Provider catalog was loaded or why it failed.
+- Added a confirmation-gated repair action that replaces an outdated desktop installation with
+  the matching version bundled in the VSIX.
+- Improved guidance for missing shared configuration and mismatched Windows user accounts.
+
 ## 0.3.0
 
 - Bundled the matching CC Router desktop installer in the VSIX.

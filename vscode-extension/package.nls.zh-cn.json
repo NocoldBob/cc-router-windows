@@ -12,6 +12,7 @@
   "command.restoreWrapper": "CC Router：恢复原 Claude Wrapper",
   "command.refresh": "CC Router：刷新 Provider 状态",
   "command.openDesktop": "CC Router：打开桌面端",
+  "command.repairDesktop": "CC Router：修复或更新桌面端",
   "configuration.helperPath": "可选的 cc-router-helper.exe 路径。留空时使用扩展自带的 helper。",
   "configuration.desktopPath": "可选的 CC Router 桌面程序路径。"
 }

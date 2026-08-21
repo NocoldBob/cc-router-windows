@@ -106,6 +106,7 @@ CC Router: Select Provider for Workspace
 CC Router: Start Claude Code Session
 CC Router: Clear Provider for Workspace
 CC Router: Open Desktop App
+CC Router: Repair or Update Desktop App
 CC Router: Restore Previous Claude Wrapper
 ```
 
@@ -141,6 +142,25 @@ Claude Code 对话框中的上下文标识来自所选模型名称，例如 `k3[
 
 点击 **安装或启动 CC Router 桌面端**，配置至少一个 Provider，然后点击桌面端的
 **保存配置**。回到 VS Code 后点击刷新。
+
+如果桌面端已经保存，但刷新后界面完全不变，通常是插件发现并打开了以前安装的旧版
+桌面端。点击侧栏中的 **修复或更新桌面端**，或在命令面板运行：
+
+```text
+CC Router: Repair or Update Desktop App
+```
+
+确认后，插件会关闭正在运行的旧桌面端，使用 VSIX 内置版本覆盖安装并重新打开。
+Provider 配置会保留，API Key 仍在 Windows Credential Manager 中。修复后若没有自动
+恢复，请在桌面端再次点击 **保存配置**，再刷新侧栏。
+
+桌面端和 VS Code 必须使用同一个 Windows 用户账户运行。共享文件位于：
+
+```text
+%APPDATA%\local.ccrouter.desktop\providers.json
+```
+
+该文件只包含 Provider 名称、Endpoint 和模型等非敏感配置，不包含 API Key。
 
 ### 提示没有配置 API Key
 

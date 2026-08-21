@@ -8,6 +8,13 @@ the public beta.
 
 ## [Unreleased]
 
+### Fixed
+
+- VS Code Companion manual refresh now reports shared Provider catalog errors instead of appearing
+  to do nothing.
+- Added a confirmation-gated repair command for replacing an outdated desktop installation with
+  the version bundled in the VSIX.
+
 ## [0.2.0-beta.1] - 2026-08-20
 
 ### Added

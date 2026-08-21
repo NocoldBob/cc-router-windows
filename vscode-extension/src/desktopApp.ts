@@ -15,6 +15,12 @@ $shell = New-Object -ComObject WScript.Shell
 Write-Output 'focused'
 `
 
+const stopScript = String.raw`
+$processes = Get-Process -Name 'cc-router' -ErrorAction SilentlyContinue
+if (-not $processes) { exit 0 }
+$processes | Stop-Process -Force -ErrorAction Stop
+`
+
 const registryScript = String.raw`
 $roots = @(
   'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall',
@@ -49,6 +55,10 @@ export async function focusRunningDesktop(): Promise<boolean> {
   } catch {
     return false
   }
+}
+
+export async function stopRunningDesktop(): Promise<void> {
+  await runPowerShell(stopScript)
 }
 
 export async function findDesktopExecutable(configuredPath: string): Promise<string | undefined> {
